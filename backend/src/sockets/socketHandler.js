@@ -5,9 +5,15 @@ const User = require('../models/User');
 let io = null;
 
 const initSocket = (server) => {
+  const clientUrl = process.env.CLIENT_URL;
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin || !clientUrl || clientUrl === '*' || origin.includes('localhost') || origin.includes('127.0.0.1') || origin === clientUrl) {
+          return callback(null, true);
+        }
+        return callback(null, true); // Permissive for preview/custom domains
+      },
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       credentials: true,
     },
