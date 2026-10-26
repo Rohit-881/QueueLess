@@ -7,6 +7,8 @@ dotenv.config();
 const app = require('./app');
 const connectDB = require('./config/db');
 const { initSocket } = require('./sockets/socketHandler');
+const User = require('./models/User');
+const { runSeed } = require('./services/seedService');
 
 const PORT = process.env.PORT || 5000;
 
@@ -14,6 +16,18 @@ const startServer = async () => {
   try {
     // 1. Connect to Database
     await connectDB();
+
+    // 1b. Auto-seed if database is freshly created / empty
+    try {
+      const userCount = await User.countDocuments();
+      if (userCount === 0) {
+        console.log('[Auto-Seed] Empty database detected. Seeding initial demo services and accounts...');
+        await runSeed();
+        console.log('[Auto-Seed] Seeding completed successfully!');
+      }
+    } catch (seedErr) {
+      console.warn('[Auto-Seed Warning] Could not auto-seed database:', seedErr.message);
+    }
 
     // 2. Create HTTP Server
     const server = http.createServer(app);
