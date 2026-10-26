@@ -53,7 +53,7 @@ export const App = () => {
               <Route
                 element={
                   <ProtectedRoute>
-                    <RoleGuard allowedRoles={['customer', 'admin']}>
+                    <RoleGuard allowedRoles={['customer', 'staff', 'admin']}>
                       <AppLayout />
                     </RoleGuard>
                   </ProtectedRoute>

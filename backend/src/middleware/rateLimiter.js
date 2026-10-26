@@ -17,7 +17,7 @@ const authLimiter = rateLimit({
 // Standard rate limit for API endpoints
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // 500 requests per window
+  max: process.env.NODE_ENV === 'production' ? 500 : 10000, // Generous limit in development for testing/demos
   standardHeaders: true,
   legacyHeaders: false,
   message: {

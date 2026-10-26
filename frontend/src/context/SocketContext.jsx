@@ -72,16 +72,19 @@ export const SocketProvider = ({ children }) => {
     }
   }, []);
 
+  const value = useMemo(
+    () => ({
+      socket: socketRef.current,
+      connectionStatus,
+      joinQueueRoom,
+      leaveQueueRoom,
+      isConnected: connectionStatus === 'connected',
+    }),
+    [connectionStatus, joinQueueRoom, leaveQueueRoom]
+  );
+
   return (
-    <SocketContext.Provider
-      value={{
-        socket: socketRef.current,
-        connectionStatus,
-        joinQueueRoom,
-        leaveQueueRoom,
-        isConnected: connectionStatus === 'connected',
-      }}
-    >
+    <SocketContext.Provider value={value}>
       {children}
     </SocketContext.Provider>
   );

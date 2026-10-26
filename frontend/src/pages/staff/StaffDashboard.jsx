@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { useToast } from '../../context/ToastContext';
@@ -29,11 +29,14 @@ export const StaffDashboard = () => {
   const { user } = useAuth();
   const { socket, joinQueueRoom, leaveQueueRoom } = useSocket();
   const toast = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   const [servicesData, setServicesData] = useState([]);
   const [selectedServiceIndex, setSelectedServiceIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const isFetchingRef = useRef(false);
 
   // Dialog states
   const [modalState, setModalState] = useState({
@@ -52,17 +55,22 @@ export const StaffDashboard = () => {
 
   // Fetch staff dashboard state
   const fetchStaffData = useCallback(async () => {
+    if (isFetchingRef.current) return;
     try {
+      isFetchingRef.current = true;
       const res = await apiService.getStaffDashboard();
       if (res.data?.success) {
         setServicesData(res.data.data || []);
       }
     } catch (err) {
-      toast.error(err.message || 'Failed to load staff queue.');
+      if (err.status !== 429) {
+        toastRef.current?.error(err.message || 'Failed to load staff queue.');
+      }
     } finally {
+      isFetchingRef.current = false;
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     fetchStaffData();
