@@ -11,7 +11,7 @@ const {
 const { protect } = require('../middleware/auth');
 const { authorize } = require('../middleware/role');
 
-router.post('/join', protect, authorize('customer', 'staff', 'admin'), joinQueue);
+router.post('/join', protect, authorize('customer', 'admin'), joinQueue);
 router.post('/walk-in', protect, authorize('staff', 'admin'), createWalkInToken);
 router.get('/my-active', protect, getMyActiveToken);
 router.get('/my-history', protect, getMyTokenHistory);
